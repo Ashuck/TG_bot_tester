@@ -1,0 +1,142 @@
+Tasks:
+
+  - command: '/help'
+    task_type: 'text'
+    messages:
+      - regex: 
+          - 'https://av100.ru'
+          - 'https://avinfobot.info/AVinfoBot_manual.pdf'
+          - 'AVinfoGuru@gmail.com'
+        inline_kbr:
+
+          - text: '🌎 Вконтакте'
+            url: 'https://vk.com/av100ru'
+          - text: '📸 Instagram'
+            url: 'https://www.instagram.com/avinfobotofficial/'
+          - text: '🔗 Facebook'
+            url: 'https://www.facebook.com/AVinfoBot'
+
+          - text: '✈️ Telegram'
+            url: 'https://t.me/av100'
+          - text: '📹 YouTube'
+            url: 'https://www.youtube.com/channel/UCgkj_17BkCi2FN_6_41DAUA'
+          
+          - text: '🍏 Скачать для IOS'
+            url: 'https://itunes.apple.com/ru/app/av100/id1187322478'
+          - text: '🤖 Скачать для Android'
+            url: 'https://play.google.com/store/apps/details\?id=com.av100.androidavito'
+          
+          - text: '🤖 Сообщить об ошибке'
+            callback_data: '/message'
+  
+  - command: '/message'
+    task_type: 'call_back'
+    messages:
+      - regex: 
+          - 'Вы перешли'
+        inline_kbr:
+          - text: '⬅ Выход'
+            callback_data: "⬅"
+
+  - command: '⬅'
+    task_type: 'call_back'
+    messages:
+      - regex:
+          - 'Вы вышли'
+        inline_kbr: []
+  
+  - command: '/reg'
+    task_type: 'text'
+    messages:
+      - regex:
+          - 'Логин: \*\*\d+\*\*'
+          - 'Пароль: \*\*\d+\*\*'
+        inline_kbr:
+          - text: 'Скачать для IOS'
+            url: 'https://itunes.apple.com/ru/app/av100/id1187322478'
+          - text: 'Скачать для Android'
+            url: 'https://play.google.com/store/apps/details\?id=com.av100.androidavito'
+
+      - regex:
+          - 'https://www.youtube.com/watch\?v=YUczNTUAmlc'
+        inline_kbr: []
+  
+  - command: '/pay'
+    task_type: 'text'
+    messages:
+      - regex:
+          - '\[оферты\]\(https://av100.ru/oferta.aspx\)'
+        inline_kbr:
+          - text: 'Безлимит на 1 день 750'
+            url: 'https://av100.ru/pay\?chatid=\d+&tariff=pay1&userid=\d+'
+          - text: 'Безлимит на 7 дней 1250'
+            url: 'https://av100.ru/pay\?chatid=\d+&tariff=pay7&userid=\d+'
+          - text: 'Оплатить месяц'
+            url: 'https://av100.ru/pay\?chatid=\d+&tariff=[\d\w]+&userid=\d+'
+          - text: 'Безлимит на 90 дней 6500'
+            url: 'https://av100.ru/pay\?chatid=\d+&tariff=pay90&userid=\d+'
+          - text: 'Безлимит на 6 мес 12000'
+            url: 'https://av100.ru/pay\?chatid=\d+&tariff=pay180&userid=\d+'
+          - text: 'Безлимит на 1 год 20000'
+            url: 'https://av100.ru/pay\?chatid=\d+&tariff=pay365&userid=\d+'
+          - text: 'Оплатить на карту Сбербанка'
+            callback_data: '/sber'
+          - text: 'Оплатить на ЮMoney'
+            callback_data: '/yandex'
+          - text: 'Купить комплексный отчет'
+            url: 'http://avclick.me/v/6J2qc'
+  
+  - command: '/sber'
+    task_type: 'call_back'
+    messages:
+      - regex:
+          - '4276400024257660'
+        inline_kbr: []
+  
+  - command: '/yandex'
+    task_type: 'call_back'
+    messages:
+      - regex:
+          - '410011333046617'
+        inline_kbr: []
+  
+  - command: '/invite'
+    task_type: 'text'
+    messages:
+      - regex:
+          - 'Перешлите своим друзьям вот это сообщение:'
+        inline_kbr: []
+
+      - regex:
+          - 'https://t.me/AV100_Bot\?start=ref\d+'
+        inline_kbr: []
+    
+  - command: '/photo'
+    task_type: 'text'
+    messages:
+      - regex: 'Статистика по загруженным изображениям'
+        inline_kbr: []
+  
+  - command: '/salecar'
+    task_type: 'text'
+    messages:
+      - regex:
+          - 'https://t.me/av100'
+        inline_kbr:
+          - text: 'Опубликовать объявление'
+            url: 'https://t.me/av100'
+  
+  - command: '/dogovor'
+    task_type: 'text'
+    messages:
+      - regex:
+          - 'Выберите нужный формат договора купли-продажи:'
+        inline_kbr:
+          - text: 'PDF'
+            callback_data: 'DOGOVOR|PDF|'
+          - text: 'WORD'
+            callbacck_data: 'DOGOVOR|WORD|'
+
+Defaults:
+  timeout: 3
+
