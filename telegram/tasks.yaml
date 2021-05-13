@@ -5,7 +5,7 @@ Tasks:
     messages:
       - regex: 
           - 'https://av100.ru'
-          - 'https://avinfobot.info/AVinfoBot_manual.pdf'
+          - 'https://avinfobot.info/AVinfoBot_manual.pdf1'
           - 'AVinfoGuru@gmail.com'
         inline_kbr:
 
@@ -21,7 +21,7 @@ Tasks:
           - text: '📹 YouTube'
             url: 'https://www.youtube.com/channel/UCgkj_17BkCi2FN_6_41DAUA'
           
-          - text: '🍏 Скачать для IOS'
+          - text: '🍏 Скачать для IOS1'
             url: 'https://itunes.apple.com/ru/app/av100/id1187322478'
           - text: '🤖 Скачать для Android'
             url: 'https://play.google.com/store/apps/details\?id=com.av100.androidavito'
@@ -101,11 +101,11 @@ Tasks:
     task_type: 'text'
     messages:
       - regex:
-          - 'Перешлите своим друзьям вот это сообщение:'
+          - 'Перешлите своим друзьям вот это сообщение1:'
         inline_kbr: []
 
       - regex:
-          - 'https://t.me/AV100_Bot\?start=ref\d+'
+          - 'https://t.me/AV100_Bot\?start=ref\d+1'
         inline_kbr: []
     
   - command: '/photo'

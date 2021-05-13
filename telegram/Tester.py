@@ -1,14 +1,17 @@
+import sqlite3
 from time import sleep
 from task_processor import TaskWorker, Error
 from datetime import datetime
 
+
 from pyrogram import Client
 
-def do_test():
+
+def do_test(path, main_bot, chat_id, path_db, num):
     app = Client('Test')
     app.start()
     TW = TaskWorker()
-    TW.load_config_from_yaml('tasks.yaml')
+    TW.load_config_from_yaml(path + '/tasks.yaml')
 
     prefix = {
         'text': "Текстовая команда пользователя ",
@@ -60,10 +63,13 @@ def do_test():
                     'Ответ не пришел за отведенное время'
                 )
             )
+    main_bot.send_message(chat_id, f'Тест окончен. Обнаружено ошибок - {len(TW.errors)}')
+
+    conn = sqlite3.connect(path_db) 
+    cursor = conn.cursor()
 
     for er in TW.errors:
-        print(er.task)
-        print(er.sub_task)
-        print(er.alert)
-        print()
+        cursor.execute(f"""INSERT INTO errors VALUES ('{er.task}', '{er.sub_task}\n{er.alert}', {num})""")
+    conn.commit()
+    conn.close()
 
