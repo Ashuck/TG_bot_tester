@@ -1,13 +1,22 @@
 import sqlite3
+import telebot
+import configparser
 from time import sleep
 from task_processor import TaskWorker, Error
 from datetime import datetime
 
-
 from pyrogram import Client
 
 
-def do_test(path, main_bot, chat_id, path_db, num):
+def send_message(chat_id, path, count):
+    config = configparser.ConfigParser()
+    config.read(path + "/config.ini")
+    bot = telebot.TeleBot(config['MainBot']['TOKEN'])
+    bot.send_message(chat_id, f'Тест окончен. Обнаружено ошибок - {count}')
+
+
+
+def do_test(path, chat_id, path_db, num):
     app = Client('Test')
     app.start()
     TW = TaskWorker()
@@ -63,7 +72,8 @@ def do_test(path, main_bot, chat_id, path_db, num):
                     'Ответ не пришел за отведенное время'
                 )
             )
-    main_bot.send_message(chat_id, f'Тест окончен. Обнаружено ошибок - {len(TW.errors)}')
+
+    send_message(chat_id, path, len(TW.errors))
 
     conn = sqlite3.connect(path_db) 
     cursor = conn.cursor()

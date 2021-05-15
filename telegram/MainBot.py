@@ -59,7 +59,6 @@ def start_test(msg):
         conn.close()
         args = (
             path_to_dir,
-            bot,
             msg.chat.id,
             path_to_db,
             num
