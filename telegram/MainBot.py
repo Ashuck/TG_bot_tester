@@ -2,6 +2,8 @@ import configparser
 import telebot
 import os
 import yaml
+import csv
+import io
 import sqlite3
 from telebot import types
 from multiprocessing import Process
@@ -23,17 +25,16 @@ conn.close()
 
 # Клавиатура
 def get_standart_keyboard():
-    mm = types.ReplyKeyboardMarkup(row_width=1)
+    mm = types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True)
     btns = [
-        'Начать тест',
-        'Результаты',
-        'Список тестов',
-        'Статистика (не работает)',
-        'Обновить клавиатуру'
+        ('Начать тест', 'Результаты'),
+        ('Список тестов', 'Статистика'),
+        ('Обновить клавиатуру',)
     ]
     for text in btns:
-        b = types.KeyboardButton(text)
-        mm.add(b)
+        mm.add(
+            *[types.KeyboardButton(t) for t in text]
+        )
     
     return mm
     
@@ -48,8 +49,8 @@ def start(message):
 
 @bot.message_handler(func=lambda msg: msg.text == 'Начать тест')
 def start_test(msg):
-    global test
-    if not test.is_alive():
+    global test_proc
+    if not test_proc.is_alive():
         conn = sqlite3.connect(path_to_db) 
         cursor = conn.cursor()
         cursor.execute(f"""INSERT INTO tests (who) VALUES ('{msg.chat.id}')""")
@@ -63,8 +64,8 @@ def start_test(msg):
             path_to_db,
             num
         )
-        test = Process(target=do_test, args=args)
-        test.start()
+        test_proc = Process(target=do_test, args=args)
+        test_proc.start()
         bot.send_message(msg.chat.id, f"Тест №{num} начался")
     else:
         bot.send_message(msg.chat.id, "Тестирование еще идет")
@@ -76,16 +77,22 @@ def get_results(msg):
     cursor = conn.cursor()
     cursor.execute("""SELECT * FROM tests ORDER BY id DESC LIMIT 1""")
     test = cursor.fetchone()
-    if test:
-        cursor.execute(f"""SELECT task, alert FROM errors WHERE test = {test[0]}""")
-        text = ''
-        for i in cursor.fetchall():
-            text += i[0] + '\n' + i[1]
-        if not text:
-            text = f'В тесте №{test[0]} ошибки не обнаружены'
+
+    if not test_proc.is_alive():
+        if test:
+            cursor.execute(f"""SELECT task, alert FROM errors WHERE test = {test[0]}""")
+            text = ''
+            for i in cursor.fetchall():
+                text += '\n' + i[0] + '\n' + i[1]
+            if not text:
+                text = f'В тесте №{test[0]} ошибки не обнаружены'
+            else:
+                text = f"Результаты теста №{test[0]}:\n" + text
+        else:
+            text = 'В базе нет тестов'
+        conn.close()
     else:
-        text = 'В базе нет тестов'
-    conn.close()
+        text = f'Тест №{test[0]} еще не закончен'
     bot.send_message(msg.chat.id, text)
         
 
@@ -95,8 +102,37 @@ def get_tests(msg):
         data = yaml.load(f)
     answer = ''
     for task in data['Tasks']:
-        answer += task['command'] + '\n'
+        answer += '  - ' + task['description'] + '\n'
     bot.send_message(msg.chat.id, answer)
+
+
+@bot.message_handler(func=lambda msg: msg.text == 'Статистика')
+def get_stats(msg):
+    conn = sqlite3.connect(path_to_db) 
+    cursor = conn.cursor()
+    cursor.execute("""SELECT result, COUNT(*) FROM paths GROUP BY result;""")
+    count = 0
+    text = ""
+    for i in cursor.fetchall():
+        count += i[1]
+        if i[0] == "":
+            text += f"Успешно обработано - {i[1]}\n"
+        elif i[0] == "4":
+            text += f"Не удалось распознать - {i[1]}\n"   
+        else:
+            text += f"Другие ошибки - {i[1]}\n"
+    with open(path_to_dir + '/statistic.csv', "w") as out_file:
+        cursor.execute("""SELECT * FROM paths WHERE result != '';""")
+        writer = csv.writer(out_file, delimiter=';')
+        stats = cursor.fetchall()
+        writer.writerows(stats)
+        text = f"Всего обработано - {count}\n" + text
+        conn.close()
+        bot.send_message(msg.chat.id, text)
+    if stats:
+        with open(path_to_dir + '/statistic.csv', "rb") as file:
+            bot.send_document(msg.chat.id, file)
+        
 
 
 @bot.message_handler(func=lambda msg: msg.text == 'Обновить клавиатуру')
@@ -108,5 +144,5 @@ def refresh_kbr(msg):
 
 
 if __name__ == '__main__':
-    test = Process(target=do_test)
+    test_proc = Process(target=do_test)
     bot.polling()

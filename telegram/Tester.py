@@ -21,14 +21,10 @@ def do_test(path, chat_id, path_db, num):
     app.start()
     TW = TaskWorker()
     TW.load_config_from_yaml(path + '/tasks.yaml')
-
-    prefix = {
-        'text': "Текстовая команда пользователя ",
-        'call_back': "Реакция на кнопку "
-    }
+    
 
     for task in TW.tasks:
-        
+        delta = 0
         if task.task_type == 'text':
             app.send_message('AV100_bot', task.command)
         elif task.task_type == 'call_back':
@@ -36,12 +32,20 @@ def do_test(path, chat_id, path_db, num):
                 app.request_callback_answer("AV100_bot", task.id_msg, task.command)
             else:
                 TW.errors.append(
-                    prefix[task.task_type] + task.command,
+                    task.description,
                     f'',
                     "Не было найдено сообщение с данной кнопкой"
                 )
+        elif task.task_type == 'image':
+            app.send_photo('AV100_bot', path + task.command)
+            last_task = task.timeout
+        elif task.task_type == 'result':
+            delta = last_task
+        else:
+            continue
 
         command_time = datetime.now().timestamp() - 2 # Поправка на милисекунды
+        command_time -=  delta # Костыль для проверки ответа на картинку
 
         sleep(task.timeout)
         messages = []
@@ -59,7 +63,7 @@ def do_test(path, chat_id, path_db, num):
                     
                     TW.errors.append(
                         Error(
-                            prefix[task.task_type] + task.command,
+                            task.description,
                             f'Подзадача №{i}',
                             result['alert']
                         )
@@ -67,13 +71,19 @@ def do_test(path, chat_id, path_db, num):
         else:
             TW.errors.append(
                 Error(
-                    task.command,
+                    task.description,
                     '', 
                     'Ответ не пришел за отведенное время'
                 )
             )
 
-    send_message(chat_id, path, len(TW.errors))
+    for _ in range(3):
+        try:
+            send_message(chat_id, path, len(TW.errors))
+            break
+        except:
+            sleep(1)
+            
 
     conn = sqlite3.connect(path_db) 
     cursor = conn.cursor()

@@ -6,6 +6,7 @@ import re
 @dataclass
 class Task:
     command: str
+    description: str
     task_type: str
     timeout: int
     messages: list
@@ -68,7 +69,8 @@ class TaskWorker:
                         if btn.get('url'):
                             alert += '' if re.findall(btn['url'], rigth_btn['url']) else f'Ссылка кнопки {btn["text"]} не совпадает с искомой\n'
                         elif btn.get('callback_data'):
-                            if btn['callback_data'] == rigth_btn['callback_data']:
+                            
+                            if re.findall(btn['callback_data'], rigth_btn['callback_data']):
                                 for t in self.tasks:
                                     if t.task_type == 'call_back' and t.command == rigth_btn['callback_data']:
                                         t.id_msg = msg.message_id
@@ -91,7 +93,7 @@ class TaskWorker:
 
         if not sub_task.get('status'):
             
-            return {'status': False, 'alert': '\n'.join(errors)}
+            return {'status': False, 'alert': ''.join(errors)}
         return {'status': True}
             
             
