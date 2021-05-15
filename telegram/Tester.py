@@ -21,7 +21,7 @@ def do_test(path, chat_id, path_db, num):
     app.start()
     TW = TaskWorker()
     TW.load_config_from_yaml(path + '/tasks.yaml')
-    
+
 
     for task in TW.tasks:
         delta = 0
@@ -32,9 +32,11 @@ def do_test(path, chat_id, path_db, num):
                 app.request_callback_answer("AV100_bot", task.id_msg, task.command)
             else:
                 TW.errors.append(
-                    task.description,
-                    f'',
-                    "Не было найдено сообщение с данной кнопкой"
+                    Error(
+                        task.description,
+                        f'',
+                        "Не было найдено сообщение с данной кнопкой"
+                    )
                 )
         elif task.task_type == 'image':
             app.send_photo('AV100_bot', path + task.command)
