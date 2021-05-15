@@ -21,6 +21,7 @@ cursor.execute("""CREATE TABLE IF NOT EXISTS errors (task text, alert text, test
 cursor.execute("""CREATE TABLE IF NOT EXISTS tests (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, who text)""")
 conn.commit()
 conn.close()
+acc_list = list(int(i) for i in config['acc_list'])
 
 
 # Клавиатура
@@ -47,7 +48,7 @@ def start(message):
     )
 
 
-@bot.message_handler(func=lambda msg: msg.text == 'Начать тест')
+@bot.message_handler(func=lambda msg: msg.text == 'Начать тест' and msg.chat.id in acc_list)
 def start_test(msg):
     global test_proc
     if not test_proc.is_alive():
@@ -71,7 +72,7 @@ def start_test(msg):
         bot.send_message(msg.chat.id, "Тестирование еще идет")
 
 
-@bot.message_handler(func=lambda msg: msg.text == 'Результаты')
+@bot.message_handler(func=lambda msg: msg.text == 'Результаты' and (msg.chat.id in acc_list))
 def get_results(msg):
     conn = sqlite3.connect(path_to_db) 
     cursor = conn.cursor()
@@ -96,7 +97,7 @@ def get_results(msg):
     bot.send_message(msg.chat.id, text)
         
 
-@bot.message_handler(func=lambda msg: msg.text == 'Список тестов')
+@bot.message_handler(func=lambda msg: msg.text == 'Список тестов' and msg.chat.id in acc_list)
 def get_tests(msg):
     with open(path_to_dir + '/tasks.yaml') as f:
         data = yaml.load(f)
@@ -106,7 +107,7 @@ def get_tests(msg):
     bot.send_message(msg.chat.id, answer)
 
 
-@bot.message_handler(func=lambda msg: msg.text == 'Статистика')
+@bot.message_handler(func=lambda msg: msg.text == 'Статистика' and msg.chat.id in acc_list)
 def get_stats(msg):
     conn = sqlite3.connect(path_to_db) 
     cursor = conn.cursor()
@@ -135,7 +136,7 @@ def get_stats(msg):
         
 
 
-@bot.message_handler(func=lambda msg: msg.text == 'Обновить клавиатуру')
+@bot.message_handler(func=lambda msg: msg.text == 'Обновить клавиатуру' and msg.chat.id in acc_list)
 def refresh_kbr(msg):
     bot.reply_to(
         msg, "Клавиатура обновлена", 
@@ -145,10 +146,9 @@ def refresh_kbr(msg):
 
 if __name__ == '__main__':
     test_proc = Process(target=do_test)
-    while True:
-        try:
-            bot.polling(none_stop=True)
-        except:
-            pass
+
+    bot.polling(none_stop=True)
+
+
 
     
