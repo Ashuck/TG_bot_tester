@@ -60,7 +60,10 @@ def do_test(path, chat_id, path_db, num):
         
         if messages:
             for i, sub_tusk in enumerate(task.messages, 1):
-                result = TW.check_task(sub_tusk, messages)
+                try:
+                    result = TW.check_task(sub_tusk, messages)
+                except:
+                    result = {'status': False, 'alert': 'Упал с ошибкой'}
                 if not result['status']:
                     
                     TW.errors.append(

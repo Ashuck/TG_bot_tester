@@ -145,4 +145,10 @@ def refresh_kbr(msg):
 
 if __name__ == '__main__':
     test_proc = Process(target=do_test)
-    bot.polling()
+    while True:
+        try:
+            bot.polling(none_stop=True)
+        except:
+            pass
+
+    
