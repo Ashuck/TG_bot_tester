@@ -78,7 +78,9 @@ while True:
                 move_to_ftp(data_folder, user_path)
                 cursor.execute(f"INSERT INTO paths VALUES ('{user_path}','{user}', '')")
             else:
-                cursor.execute(f"INSERT INTO paths VALUES ('{user_path}','{user}', '{req['errorCode']}')")
+                cursor.execute(f"SELECT * FROM paths WHERE path = '{user_path}'")
+                if not cursor.fetchall():
+                    cursor.execute(f"INSERT INTO paths VALUES ('{user_path}','{user}', '{req['errorCode']}')")
             conn.commit()
             os.system(f'rm -r {mount_docker}/*')
 
@@ -95,6 +97,8 @@ while True:
                 move_to_ftp(data_folder, user_path)
                 cursor.execute(f"INSERT INTO paths VALUES ('{user_path}','{user}', '')")
             else:
-                cursor.execute(f"INSERT INTO paths VALUES ('{user_path}','{user}', '{req['errorCode']}')")
+                cursor.execute(f"SELECT * FROM paths WHERE path = '{user_path}'")
+                if not cursor.fetchall():
+                    cursor.execute(f"INSERT INTO paths VALUES ('{user_path}','{user}', '{req['errorCode']}')")
             conn.commit()
             os.system(f'rm -r {mount_docker}/*')
