@@ -3,6 +3,7 @@ import datetime
 import os
 import shutil
 import sqlite3
+from time import sleep
 
 
 def get_files(p):
@@ -73,10 +74,15 @@ while True:
             # Отправка на обработку в докер
             data['path'] = "./tmp_video/" + base_name
             print(data)
-            req = requests.post(url, json=data).json()
+            try:
+                req = requests.post(url, json=data).json()
+            except:
+                sleep(180)
             if req["errorCode"] == "":
                 move_to_ftp(data_folder, user_path)
+                cursor.execute(f"DELETE FROM paths WHERE path = '{user_path}'")
                 cursor.execute(f"INSERT INTO paths VALUES ('{user_path}','{user}', '')")
+                cursor.fetchall()
             else:
                 cursor.execute(f"SELECT * FROM paths WHERE path = '{user_path}'")
                 if not cursor.fetchall():
@@ -91,11 +97,16 @@ while True:
             os.system(f'ffmpeg -i {item} -q:v 0 {mount_docker}/{base_name_mp4}')
             print(data)
             data['path'] = "./" + base_name_mp4
-            req = requests.post(url, json=data).json()
+            try:
+                req = requests.post(url, json=data).json()
+            except:
+                sleep(180)
             if req["errorCode"] == "":
                 data_folder = f'{mount_docker}/{base_name_mp4[:-4]}'
                 move_to_ftp(data_folder, user_path)
+                cursor.execute(f"DELETE FROM paths WHERE path = '{user_path}'")
                 cursor.execute(f"INSERT INTO paths VALUES ('{user_path}','{user}', '')")
+                cursor.fetchall()
             else:
                 cursor.execute(f"SELECT * FROM paths WHERE path = '{user_path}'")
                 if not cursor.fetchall():
