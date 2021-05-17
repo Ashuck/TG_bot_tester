@@ -78,6 +78,7 @@ while True:
                 req = requests.post(url, json=data).json()
             except:
                 sleep(180)
+                req = requests.post(url, json=data).json()
             if req["errorCode"] == "":
                 move_to_ftp(data_folder, user_path)
                 cursor.execute(f"DELETE FROM paths WHERE path = '{user_path}'")
@@ -101,6 +102,7 @@ while True:
                 req = requests.post(url, json=data).json()
             except:
                 sleep(180)
+                req = requests.post(url, json=data).json()
             if req["errorCode"] == "":
                 data_folder = f'{mount_docker}/{base_name_mp4[:-4]}'
                 move_to_ftp(data_folder, user_path)
