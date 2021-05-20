@@ -127,7 +127,9 @@ def get_stats(msg):
         writer = csv.writer(out_file, delimiter=';')
         stats = cursor.fetchall()
         writer.writerows(stats)
-        text = f"Всего обработано - {count}\n" + text
+        text = f"Всего обработано - {count}\n\n" + text
+        cursor.execute("""SELECT DISTINCT user FROM paths""")
+        text += f"\nВсего найдено пользователей - {len(cursor.fetchall())}"
         conn.close()
         bot.send_message(msg.chat.id, text)
     if stats:
