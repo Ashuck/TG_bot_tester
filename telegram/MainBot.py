@@ -15,6 +15,7 @@ config = configparser.ConfigParser()
 config.read(path_to_dir + "/config.ini")
 bot = telebot.TeleBot(config['MainBot']['TOKEN'])
 path_to_db = path_to_dir.replace('telegram', 'video') + '/paths.db'
+task_files = config['MainBot']['Task_files'].split(',')
 conn = sqlite3.connect(path_to_db) 
 cursor = conn.cursor()
 cursor.execute("""CREATE TABLE IF NOT EXISTS errors (task text, alert text, test int)""")
@@ -63,7 +64,8 @@ def start_test(msg):
             path_to_dir,
             msg.chat.id,
             path_to_db,
-            num
+            num,
+            task_files
         )
         test_proc = Process(target=do_test, args=args)
         test_proc.start()

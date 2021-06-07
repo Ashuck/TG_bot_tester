@@ -29,7 +29,8 @@ class TaskWorker:
         
         self.defaults = data['Defaults']
         self.raw_tasks = data["Tasks"]
-
+        self.task_name = data["Name"]
+        self.description = data["Desription"]
         for t in self.raw_tasks:
             for_task = {**self.defaults, **t}
             self.tasks.append(Task(**for_task))

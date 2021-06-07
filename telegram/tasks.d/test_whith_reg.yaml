@@ -1,3 +1,5 @@
+Name: 'whith_reg'
+Description: "Тест зарегистрированного пользователя"
 Tasks:
 
   - command: '/help'

@@ -16,71 +16,71 @@ def send_message(chat_id, path, count):
 
 
 
-def do_test(path, chat_id, path_db, num):
-    app = Client('Test')
-    app.start()
-    TW = TaskWorker()
-    TW.load_config_from_yaml(path + '/tasks.yaml')
+def do_test(path, chat_id, path_db, num, task_files):
+    for task_file in task_files:
+        TW = TaskWorker()
+        TW.load_config_from_yaml(f'{path}/tasks.d/{task_file}')
+        app = Client(TW.task_name)
+        app.start()
 
+        for task in TW.tasks:
+            delta = 0
+            if task.task_type == 'text':
+                app.send_message('AV100_bot', task.command)
+            elif task.task_type == 'call_back':
+                if getattr(task, 'id_msg', False):
+                    app.request_callback_answer("AV100_bot", task.id_msg, task.command)
+                else:
+                    TW.errors.append(
+                        Error(
+                            task.description,
+                            f'',
+                            "Не было найдено сообщение с данной кнопкой"
+                        )
+                    )
+            elif task.task_type == 'image':
+                app.send_photo('AV100_bot', path + task.command)
+                last_task = task.timeout
+            elif task.task_type == 'result':
+                delta = last_task
+            else:
+                continue
 
-    for task in TW.tasks:
-        delta = 0
-        if task.task_type == 'text':
-            app.send_message('AV100_bot', task.command)
-        elif task.task_type == 'call_back':
-            if getattr(task, 'id_msg', False):
-                app.request_callback_answer("AV100_bot", task.id_msg, task.command)
+            command_time = datetime.now().timestamp() - 2 # Поправка на милисекунды
+            command_time -=  delta # Костыль для проверки ответа на картинку
+
+            sleep(task.timeout)
+            messages = []
+            while True:
+                msg = app.get_history("AV100_bot", limit=1, offset=len(messages))[0]
+                if command_time >= msg.date or msg.from_user.is_self:
+                    break
+                else:
+                    messages.append(msg)
+            
+            if messages:
+                for i, sub_tusk in enumerate(task.messages, 1):
+                    try:
+                        result = TW.check_task(sub_tusk, messages)
+                    except:
+                        result = {'status': False, 'alert': 'Упал с ошибкой'}
+                    if not result['status']:
+                        
+                        TW.errors.append(
+                            Error(
+                                task.description,
+                                f'Подзадача №{i}',
+                                result['alert']
+                            )
+                        )
             else:
                 TW.errors.append(
                     Error(
                         task.description,
-                        f'',
-                        "Не было найдено сообщение с данной кнопкой"
+                        '', 
+                        'Ответ не пришел за отведенное время'
                     )
                 )
-        elif task.task_type == 'image':
-            app.send_photo('AV100_bot', path + task.command)
-            last_task = task.timeout
-        elif task.task_type == 'result':
-            delta = last_task
-        else:
-            continue
-
-        command_time = datetime.now().timestamp() - 2 # Поправка на милисекунды
-        command_time -=  delta # Костыль для проверки ответа на картинку
-
-        sleep(task.timeout)
-        messages = []
-        while True:
-            msg = app.get_history("AV100_bot", limit=1, offset=len(messages))[0]
-            if command_time >= msg.date or msg.from_user.is_self:
-                break
-            else:
-                messages.append(msg)
-        
-        if messages:
-            for i, sub_tusk in enumerate(task.messages, 1):
-                try:
-                    result = TW.check_task(sub_tusk, messages)
-                except:
-                    result = {'status': False, 'alert': 'Упал с ошибкой'}
-                if not result['status']:
-                    
-                    TW.errors.append(
-                        Error(
-                            task.description,
-                            f'Подзадача №{i}',
-                            result['alert']
-                        )
-                    )
-        else:
-            TW.errors.append(
-                Error(
-                    task.description,
-                    '', 
-                    'Ответ не пришел за отведенное время'
-                )
-            )
 
     for _ in range(3):
         try:
