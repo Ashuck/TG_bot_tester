@@ -18,7 +18,7 @@ path_to_db = path_to_dir.replace('telegram', 'video') + '/paths.db'
 task_files = config['MainBot']['Task_files'].split(',')
 conn = sqlite3.connect(path_to_db) 
 cursor = conn.cursor()
-cursor.execute("""CREATE TABLE IF NOT EXISTS errors (task text, alert text, test int)""")
+cursor.execute("""CREATE TABLE IF NOT EXISTS errors (task text, alert text, test int, script text)""")
 cursor.execute("""CREATE TABLE IF NOT EXISTS tests (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, who text)""")
 conn.commit()
 conn.close()

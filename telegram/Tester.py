@@ -35,7 +35,8 @@ def do_test(path, chat_id, path_db, num, task_files):
                         Error(
                             task.description,
                             f'',
-                            "Не было найдено сообщение с данной кнопкой"
+                            "Не было найдено сообщение с данной кнопкой",
+                            TW.description
                         )
                     )
             elif task.task_type == 'image':
@@ -70,7 +71,8 @@ def do_test(path, chat_id, path_db, num, task_files):
                             Error(
                                 task.description,
                                 f'Подзадача №{i}',
-                                result['alert']
+                                result['alert'],
+                                TW.description
                             )
                         )
             else:
@@ -78,7 +80,8 @@ def do_test(path, chat_id, path_db, num, task_files):
                     Error(
                         task.description,
                         '', 
-                        'Ответ не пришел за отведенное время'
+                        'Ответ не пришел за отведенное время',
+                        TW.description
                     )
                 )
 
