@@ -2,17 +2,17 @@ import sqlite3
 import telebot
 import configparser
 from time import sleep
-from task_processor import TaskWorker, Error
+from task_processor import TaskWorker, Error, Result
 from datetime import datetime
 
 from pyrogram import Client
 
 
-def send_message(chat_id, path, count):
+def send_message(chat_id, path):
     config = configparser.ConfigParser()
     config.read(path + "/config.ini")
     bot = telebot.TeleBot(config['MainBot']['TOKEN'])
-    bot.send_message(chat_id, f'Тест окончен. Обнаружено ошибок - {count}')
+    bot.send_message(chat_id, f'Тест окончен.')
 
 
 
@@ -24,6 +24,7 @@ def do_test(path, chat_id, path_db, num, task_files):
         app.start()
 
         for task in TW.tasks:
+            print(TW.tasks)
             delta = 0
             if task.task_type == 'text':
                 app.send_message('AV100_bot', task.command)
@@ -39,6 +40,7 @@ def do_test(path, chat_id, path_db, num, task_files):
                             TW.description
                         )
                     )
+                    continue
             elif task.task_type == 'image':
                 app.send_photo('AV100_bot', path + task.command)
                 last_task = task.timeout
@@ -60,13 +62,15 @@ def do_test(path, chat_id, path_db, num, task_files):
                     messages.append(msg)
             
             if messages:
+                result_flag = False
                 for i, sub_tusk in enumerate(task.messages, 1):
                     try:
                         result = TW.check_task(sub_tusk, messages)
-                    except:
+                    except Exception as ex:
+                        # print(ex)
                         result = {'status': False, 'alert': 'Упал с ошибкой'}
                     if not result['status']:
-                        
+                        result_flag = True
                         TW.errors.append(
                             Error(
                                 task.description,
@@ -75,29 +79,44 @@ def do_test(path, chat_id, path_db, num, task_files):
                                 TW.description
                             )
                         )
+                
+
             else:
+                result = {'status': False, 'alert': 'Ответ не пришел за отведенное время'}
                 TW.errors.append(
                     Error(
                         task.description,
                         '', 
-                        'Ответ не пришел за отведенное время',
+                        result['alert'],
                         TW.description
                     )
                 )
+            TW.results.append(
+                Result(
+                    task.description,
+                    "Провал" if result_flag else "Успех",
+                    TW.description
+                )
+            )
+        app.__exit__()
+        conn = sqlite3.connect(path_db) 
+        cursor = conn.cursor()
+
+        for er in TW.errors:
+            cursor.execute(f"""INSERT INTO errors VALUES ('{er.task}', '{er.sub_task}\n{er.alert}', {num}, '{er.description}')""")
+        for res in TW.results:
+            cursor.execute(f"""INSERT INTO results VALUES ('{res.task}', '{res.result}', {num}, '{res.description}')""")
+
+        conn.commit()
+        conn.close()
+
 
     for _ in range(3):
         try:
-            send_message(chat_id, path, len(TW.errors))
+            send_message(chat_id, path)
             break
         except:
             sleep(1)
             
 
-    conn = sqlite3.connect(path_db) 
-    cursor = conn.cursor()
-
-    for er in TW.errors:
-        cursor.execute(f"""INSERT INTO errors VALUES ('{er.task}', '{er.sub_task}\n{er.alert}', {num})""")
-    conn.commit()
-    conn.close()
 

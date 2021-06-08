@@ -19,6 +19,7 @@ task_files = config['MainBot']['Task_files'].split(',')
 conn = sqlite3.connect(path_to_db) 
 cursor = conn.cursor()
 cursor.execute("""CREATE TABLE IF NOT EXISTS errors (task text, alert text, test int, script text)""")
+cursor.execute("""CREATE TABLE IF NOT EXISTS results (task text, result text, test int, script text)""")
 cursor.execute("""CREATE TABLE IF NOT EXISTS tests (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, who text)""")
 conn.commit()
 conn.close()
@@ -83,20 +84,31 @@ def get_results(msg):
 
     if not test_proc.is_alive():
         if test:
-            cursor.execute(f"""SELECT task, alert FROM errors WHERE test = {test[0]}""")
-            text = ''
-            for i in cursor.fetchall():
-                text += '\n' + i[0] + '\n' + i[1]
-            if not text:
-                text = f'В тесте №{test[0]} ошибки не обнаружены'
-            else:
-                text = f"Результаты теста №{test[0]}:\n" + text
+            cursor.execute(f'SELECT DISTINCT script FROM results WHERE test = {test[0]}')
+            scripts = cursor.fetchall()
+            print(scripts)
+            for script in scripts:
+                cursor.execute(f"""SELECT task, result FROM results WHERE test = {test[0]} AND script = '{script[0]}'""")
+                text = ''
+                for i in cursor.fetchall():
+                    print(i)
+                    if i[1] == 'Успех':
+                        r = '✅ Успех'
+                    else:
+                        r = f'❌ {i[1]}'
+                    text += '\n' + i[0] + '\n' + r
+
+                text = f'Результаты теста  №{test[0]} "{script[0]}":\n' + text
+                bot.send_message(msg.chat.id, text)
+
         else:
-            text = 'В базе нет тестов'
-        conn.close()
+            text = 'В базе нет результатов'
+        
+            bot.send_message(msg.chat.id, text)
     else:
         text = f'Тест №{test[0]} еще не закончен'
-    bot.send_message(msg.chat.id, text)
+        bot.send_message(msg.chat.id, text)
+    conn.close()
         
 
 @bot.message_handler(func=lambda msg: msg.text == 'Список тестов' and msg.chat.id in acc_list)
@@ -137,7 +149,6 @@ def get_stats(msg):
     if stats:
         with open(path_to_dir + '/statistic.csv', "rb") as file:
             bot.send_document(msg.chat.id, file)
-        
 
 
 @bot.message_handler(func=lambda msg: msg.text == 'Обновить клавиатуру' and msg.chat.id in acc_list)

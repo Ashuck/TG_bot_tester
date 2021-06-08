@@ -1,5 +1,5 @@
-Name: 'whith_reg'
-Description: "Тест зарегистрированного пользователя"
+Name: 'whithout_reg'
+Description: "Незарегистрированный пользователь"
 Tasks:
 
   - command: '/help'

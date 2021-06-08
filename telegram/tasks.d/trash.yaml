@@ -1,0 +1,183 @@
+        #   - 'https://av100.ru'
+        #   - 'https://avinfobot.info/AVinfoBot_manual.pdf'
+        #   - 'AVinfoGuru@gmail.com'
+        # inline_kbr:
+
+        #   - text: '🌎 Вконтакте'
+        #     url: 'https://vk.com/av100ru'
+        #   - text: '📸 Instagram'
+        #     url: 'https://www.instagram.com/avinfobotofficial/'
+        #   - text: '🔗 Facebook'
+        #     url: 'https://www.facebook.com/AVinfoBot'
+
+        #   - text: '✈️ Telegram'
+        #     url: 'https://t.me/av100'
+        #   - text: '📹 YouTube'
+        #     url: 'https://www.youtube.com/channel/UCgkj_17BkCi2FN_6_41DAUA'
+          
+        #   - text: '🍏 Скачать для IOS'
+        #     url: 'https://itunes.apple.com/ru/app/av100/id1187322478'
+        #   - text: '🤖 Скачать для Android'
+        #     url: 'https://play.google.com/store/apps/details\?id=com.av100.androidavito'
+          
+        #   - text: '🤖 Сообщить об ошибке'
+        #     callback_data: '/message'
+  
+  # - command: '/message'
+  #   description: 'Реакция на кнопку "🤖 Сообщить об ошибке"'
+  #   task_type: 'call_back'
+  #   messages:
+  #     - regex: 
+  #         - 'Вы перешли'
+  #       inline_kbr:
+  #         - text: '⬅ Выход'
+  #           callback_data: "⬅"
+
+  # - command: '⬅'
+  #   description: 'Реакция на кнопку "⬅ Выход"'
+  #   task_type: 'call_back'
+  #   messages:
+  #     - regex:
+  #         - 'Вы вышли'
+  #       inline_kbr: []
+  
+  # - command: '/reg'
+  #   description: 'Реакция на команду "/reg"' 
+  #   task_type: 'text'
+  #   messages:
+  #     - regex:
+  #         - 'Логин: \*\*\d+\*\*'
+  #         - 'Пароль: \*\*\d+\*\*'
+  #         - '[⭐️](https://www.youtube.com/watch\?)'
+  #       inline_kbr:
+  #         - text: 'Скачать для IOS'
+  #           url: 'https://itunes.apple.com/ru/app/av100/id1187322478'
+  #         - text: 'Скачать для Android'
+  #           url: 'https://play.google.com/store/apps/details\?id=com.av100.androidavito'
+  
+  # - command: '/pay'
+  #   description: 'Реакция на команду "/pay"' 
+  #   task_type: 'text'
+  #   messages:
+  #     - regex:
+  #         - '\[оферты\]\(https://av100.ru/oferta.aspx\)'
+  #       inline_kbr:
+  #         - text: 'Безлимит на 1 день 750'
+  #           url: 'https://av100.ru/pay\?chatid=\d+&tariff=pay1&userid=\d+'
+  #         - text: 'Безлимит на 7 дней 1250'
+  #           url: 'https://av100.ru/pay\?chatid=\d+&tariff=pay7&userid=\d+'
+  #         - text: 'Оплатить месяц'
+  #           url: 'https://av100.ru/pay\?chatid=\d+&tariff=[\d\w]+&userid=\d+'
+  #         - text: 'Безлимит на 90 дней 6500'
+  #           url: 'https://av100.ru/pay\?chatid=\d+&tariff=pay90&userid=\d+'
+  #         - text: 'Безлимит на 6 мес 12000'
+  #           url: 'https://av100.ru/pay\?chatid=\d+&tariff=pay180&userid=\d+'
+  #         - text: 'Безлимит на 1 год 20000'
+  #           url: 'https://av100.ru/pay\?chatid=\d+&tariff=pay365&userid=\d+'
+  #         - text: 'Оплатить на карту Сбербанка'
+  #           callback_data: '/sber'
+  #         - text: 'Оплатить на ЮMoney'
+  #           callback_data: '/yandex'
+  #         - text: 'Купить комплексный отчет'
+  #           url: 'http://avclick.me/v/6J2qc'
+  
+  # - command: '/sber'
+  #   description: 'Реакция на кнопку "Оплатить на карту Сбербанка"'
+  #   task_type: 'call_back'
+  #   messages:
+  #     - regex:
+  #         - '4276400024257660'
+  #       inline_kbr: []
+  
+  # - command: '/yandex'
+  #   description: 'Реакция на кнопку "Оплатить на ЮMoney"'
+  #   task_type: 'call_back'
+  #   messages:
+  #     - regex:
+  #         - '410011333046617'
+  #       inline_kbr: []
+  
+  # - command: '/invite'
+  #   description: 'Реакция на команду "/invite"'
+  #   task_type: 'text'
+  #   messages:
+  #     - regex:
+  #         - 'Перешлите своим друзьям вот это сообщение:'
+  #       inline_kbr: []
+
+  #     - regex:
+  #         - 'https://t.me/AV100_Bot\?start=ref\d+1'
+  #       inline_kbr: []
+    
+  # - command: '/photo'
+  #   description: 'Реакция на команду "/photo"'
+  #   task_type: 'text'
+  #   messages:
+  #     - regex: 'Статистика по загруженным изображениям'
+  #       inline_kbr: []
+  
+  # - command: '/salecar'
+  #   description: 'Реакция на команду "/salecar"'
+  #   task_type: 'text'
+  #   messages:
+  #     - regex:
+  #         - 'https://t.me/av100'
+  #       inline_kbr:
+  #         - text: 'Опубликовать объявление'
+  #           url: 'https://t.me/av100'
+  
+  # - command: '/dogovor'
+  #   description: 'Реакция на команду "/dogovor"'
+  #   task_type: 'text'
+  #   messages:
+  #     - regex:
+  #         - 'Выберите нужный формат договора купли-продажи:'
+  #       inline_kbr:
+  #         - text: 'PDF'
+  #           callback_data: 'DOGOVOR|PDF|'
+  #         - text: 'WORD'
+  #           callbacck_data: 'DOGOVOR|WORD|'
+  
+  # - command: '/images/with_number.jpg'
+  #   description: 'Реакция на картинку с номером'
+  #   task_type: 'image'
+  #   messages:
+  #     - regex:
+  #         - '(Ваше сообщение в обработке|Выберите нужное действие)'
+  #       inline_kbr: []
+  
+  # - command: ''
+  #   description: 'Результат поиска по картинке с номером'
+  #   task_type: 'result'
+  #   timeout: 15
+  #   messages:
+  #     - regex:
+  #         - 'Выберите нужное действие'
+        
+  #       inline_kbr:           
+  #         - text: 'С124НС163'
+  #           callback_data: 'С124НС163'
+  #         - text: '🎭 Поиск лиц по фотографии'
+  #           callback_data: 'PHOTOFACES\|\d+\|\d+'
+
+  # - command: '/images/without_number.jpg'
+  #   description: 'Реакция на картинку без номера'
+  #   task_type: 'image'
+  #   messages:
+  #     - regex:
+  #         - '(Ваше сообщение в обработке|Выберите нужное действие)'
+  #       inline_kbr: []
+  
+  # - command: ''
+  #   description: 'Результат поиска по картинке без номера'
+  #   task_type: 'result'
+  #   timeout: 15
+  #   messages:
+  #     - regex:
+  #         - 'Выберите нужное действие'
+        
+  #       inline_kbr: 
+  #         - text: '🎭 Поиск лиц по фотографии'
+  #           callback_data: 'PHOTOFACES\|\d+\|\d+'
+  #         - text: '🚘 Поиск госномера на фото'
+  #           callback_data: 'PHOTOGOSNUM\|\d+\|\d+'

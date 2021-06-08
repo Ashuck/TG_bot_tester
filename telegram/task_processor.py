@@ -17,11 +17,21 @@ class Error:
     task: str
     sub_task: str
     alert: str
+    description: str
+
+
+@dataclass
+class Result:
+    task: str
+    result: str
+    description: str
 
 
 class TaskWorker:
-    tasks = []
-    errors = []
+    def __init__(self):
+        self.tasks = []
+        self.errors = []
+        self.results = []
 
     def load_config_from_yaml(self, path):
         with open(path) as f:
@@ -30,7 +40,7 @@ class TaskWorker:
         self.defaults = data['Defaults']
         self.raw_tasks = data["Tasks"]
         self.task_name = data["Name"]
-        self.description = data["Desription"]
+        self.description = data["Description"]
         for t in self.raw_tasks:
             for_task = {**self.defaults, **t}
             self.tasks.append(Task(**for_task))
@@ -46,6 +56,9 @@ class TaskWorker:
                     text = msg.text.markdown
                 else:
                     text = msg.caption
+                if re.findall('Не понял Ваше', text):
+                    alert += "Бот не понял команду\n"
+                    break
                 m = re.findall(regex, text)
                 # print(text)
                 if m:                   
